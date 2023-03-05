@@ -13,7 +13,7 @@ module.exports = {
     liveReload: true,
     hot: true,
     static: {
-      directory: path.join(__dirname, 'build'),
+      directory: path.join(__dirname, 'dist'),
     },
   },
   module: {
@@ -61,7 +61,7 @@ module.exports = {
   },
   output: {
     filename: "bundle.js",
-    path: path.resolve(__dirname, "build"),
+    path: path.resolve(__dirname, "dist"),
   },
   plugins: [
     new HtmlWebpackPlugin({
