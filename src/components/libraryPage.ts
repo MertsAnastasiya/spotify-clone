@@ -1,4 +1,5 @@
 import { Library } from './api/libraryController';
+import { LibraryNavigation } from './libraryNavigation';
 import { OnClickLink, UserLibrary, onClickSavedPlaylist } from './types/type';
 import { querySelectNonNull } from './utils';
 import { EMAIL } from './constants';
@@ -24,7 +25,7 @@ export class LibraryPage {
         const wrapper: Element = document.createElement('div');
         wrapper.classList.add('playlists');
 
-        mainContainer.appendChild(this.createLibraryNavigation());
+        mainContainer.appendChild(new LibraryNavigation().draw('playlists'));
         mainContainer.appendChild(header);
         wrapper.appendChild(this.createBlockEpisodes());
 
@@ -32,36 +33,7 @@ export class LibraryPage {
         this.updateLibrary();
     }
 
-    private createLibraryNavigation(): Element {
-        const nav: Element = document.createElement('nav');
-        nav.classList.add('library__navigation');
-        const list: Element = document.createElement('ul');
-        list.classList.add('navigation__list');
 
-        list.appendChild(this.createNavItem('playlists'));
-        list.appendChild(this.createNavItem('subscriptions'));
-        nav.appendChild(list);
-
-        return nav;
-    }
-
-    private createNavItem(name: string): Element {
-        const item: Element = document.createElement('li');
-        item.classList.add('nav__item');
-        item.classList.add(`item_${name}`);
-        //TO DO
-        //will be change for active link
-        if (name === 'playlists') {
-            item.classList.add('active');
-        }
-        const link: HTMLAnchorElement = document.createElement('a');
-        link.classList.add('link');
-        name === 'episodes' ? (link.href = `/#saved`) : (link.href = `/#${name}List`);
-        link.textContent = `${name}`;
-        item.appendChild(link);
-
-        return item;
-    }
 
     private createBlockEpisodes(): Element {
         const wrapper: Element = document.createElement('div');
@@ -70,7 +42,7 @@ export class LibraryPage {
         header.textContent = 'Your liked episodes';
         const amount: Element = document.createElement('div');
         amount.classList.add('amount-episodes');
-        amount.textContent = `2 episodes`;
+        amount.textContent = `  episodes`;
         wrapper.appendChild(header);
         wrapper.appendChild(amount);
 
@@ -80,24 +52,22 @@ export class LibraryPage {
     }
 
     private createAddButton(): Element {
-        const library = this.library;
+        const library: Library = this.library;
         const wrapper: Element = document.createElement('div');
         wrapper.classList.add('playlist');
         const image: HTMLImageElement = document.createElement('img');
         image.src =
             'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/OOjs_UI_icon_add.svg/1024px-OOjs_UI_icon_add.svg.png';
-        image.alt = 'ADD PLAYLIST';
+        image.alt = 'Add playlist';
         image.classList.add('playlist__image');
 
         const wrapperName: Element = document.createElement('div');
-        wrapperName.classList.add('playlist__name__wrapper');
-        const owner: HTMLElement = document.createElement('div');
-        owner.textContent = 'User';
-        const playlistName: Element = document.createElement('h3');
-        playlistName.textContent = `Add playlist`;
+        wrapperName.classList.add('name__wrapper');
 
-        wrapperName.appendChild(playlistName);
-        wrapperName.appendChild(owner);
+        const playlistName: Element = document.createElement('h3');
+        playlistName.textContent = `New playlist`;
+
+        wrapperName.append(playlistName);
         wrapper.appendChild(image);
         wrapper.appendChild(wrapperName);
         image.addEventListener('click', addPlaylist);
@@ -116,7 +86,7 @@ export class LibraryPage {
                     if (inputElem.value != '' && Number.isNaN(Number(inputElem.value)) === true) {
                         playlistName.innerHTML = inputElem.value;
                         library.addNewPlaylist(inputElem.value).then(() => {
-                            setTimeout(()=>{
+                            setTimeout(() => {
                                 window.location.href = '/#library';
                             }, 1000);
                         });
@@ -140,29 +110,30 @@ export class LibraryPage {
         image.classList.add('playlist__image');
 
         const wrapperName: Element = document.createElement('div');
-        wrapperName.classList.add('playlist__name__wrapper');
+        wrapperName.classList.add('name__wrapper');
 
         const playlistName: Element = document.createElement('h3');
         playlistName.textContent = `${playlist}`;
-        const owner: HTMLElement = document.createElement('div');
-        owner.classList.add('owner');
-        owner.textContent = 'User';
         const deletePlaylist: Element = document.createElement('div');
         deletePlaylist.classList.add('delete');
         const renamePlaylist: Element = document.createElement('div');
         renamePlaylist.classList.add('rename');
-        owner.append(deletePlaylist, renamePlaylist);
+        const divEdit: Element = document.createElement('div');
+        divEdit.classList.add('edit__wrapper');
+        divEdit.append(deletePlaylist, renamePlaylist);
+        wrapperName.append(divEdit);
 
         deletePlaylist.addEventListener('click', (event) => {
             event.stopPropagation();
             library.removePlaylist(playlist).then(() => {
-                setTimeout(()=>{
+                setTimeout(() => {
                     window.location.href = '/#library';
                 }, 1000);
             });
         });
         renamePlaylist.addEventListener('click', rename);
-       function rename(event: Event) {
+
+        function rename(event: Event) {
             event.stopPropagation();
             const inputElem: HTMLInputElement = document.createElement('input');
             inputElem.placeholder = playlist;
@@ -175,7 +146,7 @@ export class LibraryPage {
                     if (inputElem.value != '') {
                         playlistName.innerHTML = inputElem.value;
                         await library.renamePlaylist(playlist, inputElem.value);
-                        setTimeout(()=>{
+                        setTimeout(() => {
                             window.location.href = '/#library';
                         }, 1000);
                     } else {
@@ -196,7 +167,7 @@ export class LibraryPage {
         });
 
         wrapperName.appendChild(playlistName);
-        wrapperName.appendChild(owner);
+        wrapperName.append(divEdit);
         wrapper.appendChild(image);
         wrapper.appendChild(wrapperName);
 

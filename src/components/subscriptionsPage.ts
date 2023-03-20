@@ -3,6 +3,7 @@ import Controller from './controller';
 import { OnClickPlayButton, OnClickPodcastCard, UserLibrary } from './types/type';
 import { replaceTags, requiresNonNull } from './utils';
 import { EMAIL } from './constants';
+import { LibraryNavigation } from './libraryNavigation';
 
 export default class SubscriptionPage {
     private readonly controller: Controller;
@@ -21,21 +22,24 @@ export default class SubscriptionPage {
         const main = document.querySelector('main');
         if (main) {
             main.innerHTML = '';
-            main.innerHTML = `
-                <h3 class="h3 podcast__cards--title"></h3>
-                <ul class="podcast__cards"></ul>
-                `;
+            main.append(new LibraryNavigation().draw('subscriptions'));
+            const title: Element = document.createElement('h2');
+            title.classList.add('h2');
+            const listOfCards: Element = document.createElement('ul');
+            listOfCards.classList.add('podcast__cards');
+            main.append(title);
+            main.append(listOfCards);
         }
     }
 
-    private changeTitle() {
-        const title: HTMLElement | null = document.querySelector('.h3.podcast__cards--title');
+    private changeTitle(): void {
+        const title: HTMLElement | null = document.querySelector('.h2');
         if (title) {
             title.textContent = `Subscriptions`;
         }
     }
 
-    private drawCard(id: number) {
+    private drawCard(id: number): void {
         this.controller.fetchById(id).then((data) => {
             const podcastCards: Element = requiresNonNull(document.querySelector('.podcast__cards'));
             const card: Element = document.createElement('li');
@@ -80,7 +84,7 @@ export default class SubscriptionPage {
     }
 
     private setDefaultImage(): void {
-        const images = document.getElementsByClassName('card__image');
+        const images: HTMLCollectionOf<Element> = document.getElementsByClassName('card__image');
         Array.from(images).forEach((val) => {
             val.addEventListener('error', () => {
                 if (val instanceof HTMLImageElement) {
@@ -90,7 +94,7 @@ export default class SubscriptionPage {
         });
     }
 
-    public draw() {
+    public draw(): void {
         this.addStructure();
         this.changeTitle();
         this.library.userLibrary().then((data) => {

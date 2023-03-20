@@ -1,6 +1,13 @@
 import { applePodcastPageDOM, spotifyPodcastPageDOM } from './templates/podcastPageDom';
 import Controller from './controller';
-import { ActionsButtons, episode, OnClickAction, onClickEpisodeCard, OnClickPlayButton, UserLibrary } from './types/type';
+import {
+    ActionsButtons,
+    episode,
+    OnClickAction,
+    onClickEpisodeCard,
+    OnClickPlayButton,
+    UserLibrary,
+} from './types/type';
 import { formatTime, replaceTags, requiresNonNull } from './utils';
 import { Library } from './api/libraryController';
 import { EMAIL } from './constants';
@@ -17,8 +24,14 @@ export default class PodcastPage {
     private readonly isPlay: boolean;
     private readonly onClickAction: OnClickAction;
 
-
-    constructor(podcastId: number, currentEpesodeId: number, isPlay: boolean, onClickEpisodeCard: onClickEpisodeCard, onClickPlayButton: OnClickPlayButton, onClickAction: OnClickAction) {
+    constructor(
+        podcastId: number,
+        currentEpesodeId: number,
+        isPlay: boolean,
+        onClickEpisodeCard: onClickEpisodeCard,
+        onClickPlayButton: OnClickPlayButton,
+        onClickAction: OnClickAction
+    ) {
         this.podcastId = podcastId;
         this.controller = new Controller();
         this.data = this.controller.fetchEpisodesById(podcastId);
@@ -118,18 +131,15 @@ export default class PodcastPage {
                 break;
         }
     }
+
     private addGeneralDescription(id: number) {
         this.controller.fetchById(id).then((podcastData) => {
             const podcastImg = document.querySelector('.podcast__image') as HTMLImageElement;
             const podcastTitle = document.querySelector('.podcast__title') as HTMLElement;
             const podcastDescription = (document.querySelector('.podcast__about__text') as HTMLElement) || undefined;
-            if (podcastData.image != '') {
-                podcastImg.src = podcastData.image;
-            } else {
-                podcastImg.src = `../assets/img/fav-icon.png`;
-            }
+            podcastImg.src = podcastData.image || `../assets/img/fav-icon.png`;
             podcastTitle.innerText = podcastData.title;
-            if (podcastDescription != undefined) {
+            if (podcastDescription !== undefined) {
                 podcastDescription.innerText = replaceTags(podcastData.description);
             }
         });
@@ -141,8 +151,8 @@ export default class PodcastPage {
             const main = document.querySelector('.main__container');
             datalist.id = 'playlists';
             playlists.forEach((elem) => {
-                if (elem != 'email' && elem != 'subscribedPodcasts' && elem != '_id') {
-                    const option = document.createElement('option') as HTMLOptionElement;
+                if (elem !== 'email' && elem !== 'subscribedPodcasts' && elem !== '_id') {
+                    const option: HTMLOptionElement = document.createElement('option') as HTMLOptionElement;
                     option.value = elem;
                     datalist.appendChild(option);
                 }
@@ -166,7 +176,7 @@ export default class PodcastPage {
         buttonsPlay.forEach((button) =>
             button.addEventListener('click', (event: Event) => {
                 event.stopPropagation();
-                this.onClickPlayButton(Number(button.getAttribute('id')),event);
+                this.onClickPlayButton(Number(button.getAttribute('id')), event);
             })
         );
 
@@ -181,51 +191,53 @@ export default class PodcastPage {
         saveButtons.forEach((elem) => {
             (elem as HTMLElement).addEventListener('click', (event) => {
                 event.stopPropagation();
-                const actionsContainer = elem.parentElement as HTMLElement;
-                const inputElem = `
-                <input class="playlist__input" list="playlists" placeholder="chose playlist">
-                <img data-id=${elem.dataset.id} class='addButton' style="width: 20px; height: 20px; cursor: pointer; border: 1px solid #993aed;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/OOjs_UI_icon_add.svg/1024px-OOjs_UI_icon_add.svg.png">
-                `;
-                actionsContainer.innerHTML = '';
-                actionsContainer.innerHTML = inputElem;
-                const addButton = document.querySelector('.addButton') as HTMLElement;
-                const playlistInput = document.querySelector('.playlist__input') as HTMLInputElement;
-                actionsContainer.style.opacity = '1';
-                playlistInput?.addEventListener('click', (e) => e.stopPropagation());
-                addButton?.addEventListener('click', async (event) => {
-                    event.stopPropagation();
-                    await this.library
-                        .addItemToPlaylist(playlistInput.value, elem.dataset.id as string)
-                        .then(() => {
-                            actionsContainer.innerHTML = '';
-                            actionsContainer.innerHTML = `
-                                <div class="button_action share"></div>
-                                <div class="button_action saved" data-id=${elem.dataset.id}>
-                                </div>
-                                <div class="button_action download"></div>`;
-                            actionsContainer.style.opacity = '';
+                console.log('save to playlist');
 
-                            return playlistInput.value;
-                        })
-                        .then((playlist) => {
-                            const savedButton = document.querySelector('.saved') as HTMLElement;
-                            savedButton.addEventListener('click', async (event) => {
-                                event.stopPropagation();
-                                await this.library.removeItemFromPlaylist(playlist, elem.dataset.id as string);
-                                actionsContainer.innerHTML = '';
-                                actionsContainer.innerHTML = `
-                                <div class="button_action share"></div>
-                                <div class="button_action save" data-id=${elem.dataset.id}>
-                                </div>
-                                <div class="button_action download"></div>`;
-                            });
-                        });
-                });
+//                 const actionsContainer = elem.parentElement as HTMLElement;
+//                 const inputElem = `
+//                 <input class="playlist__input" list="playlists" placeholder="chose playlist">
+//                 <img data-id=${elem.dataset.id} class='addButton' style="width: 20px; height: 20px; cursor: pointer; border: 1px solid #993aed;" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/OOjs_UI_icon_add.svg/1024px-OOjs_UI_icon_add.svg.png">
+//                 `;
+//                 actionsContainer.innerHTML = '';
+//                 actionsContainer.innerHTML = inputElem;
+//                 const addButton = document.querySelector('.addButton') as HTMLElement;
+//                 const playlistInput = document.querySelector('.playlist__input') as HTMLInputElement;
+//                 actionsContainer.style.opacity = '1';
+//                 playlistInput?.addEventListener('click', (e) => e.stopPropagation());
+//                 addButton?.addEventListener('click', async (event) => {
+//                     event.stopPropagation();
+//                     await this.library
+//                         .addItemToPlaylist(playlistInput.value, elem.dataset.id as string)
+//                         .then(() => {
+//                             actionsContainer.innerHTML = '';
+//                             actionsContainer.innerHTML = `
+//                                 <div class="button_action share"></div>
+//                                 <div class="button_action saved" data-id=${elem.dataset.id}>
+//                                 </div>
+//                                 <div class="button_action download"></div>`;
+//                             actionsContainer.style.opacity = '';
+//
+//                             return playlistInput.value;
+//                         })
+//                         .then((playlist) => {
+//                             const savedButton = document.querySelector('.saved') as HTMLElement;
+//                             savedButton.addEventListener('click', async (event) => {
+//                                 event.stopPropagation();
+//                                 await this.library.removeItemFromPlaylist(playlist, elem.dataset.id as string);
+//                                 actionsContainer.innerHTML = '';
+//                                 actionsContainer.innerHTML = `
+//                                 <div class="button_action share"></div>
+//                                 <div class="button_action save" data-id=${elem.dataset.id}>
+//                                 </div>
+//                                 <div class="button_action download"></div>`;
+//                             });
+//                         });
+//                 });
             });
         });
 
         const buttonsShare: NodeListOf<Element> = requiresNonNull(document.querySelectorAll('.share'));
-        buttonsShare.forEach(shareButton => {
+        buttonsShare.forEach((shareButton) => {
             shareButton.addEventListener('click', (event) => {
                 event.stopPropagation();
                 this.onClickAction(ActionsButtons.Share, event);
@@ -233,7 +245,7 @@ export default class PodcastPage {
         });
 
         const buttonsDownload: NodeListOf<Element> = requiresNonNull(document.querySelectorAll('.download'));
-        buttonsDownload.forEach(dowloadButton => {
+        buttonsDownload.forEach((dowloadButton) => {
             dowloadButton.addEventListener('click', (event) => {
                 event.stopPropagation();
                 this.onClickAction(ActionsButtons.More, event);

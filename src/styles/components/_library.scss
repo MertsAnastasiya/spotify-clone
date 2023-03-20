@@ -15,9 +15,9 @@
     border-radius: $radius;
 }
 
-// .active {
-//     background-color: $color-not-active;
-// }
+.item_active .link {
+    color: $color-bright;
+}
 
 .playlists {
     display: flex;
@@ -39,37 +39,29 @@
     border-radius: $radius;
 }
 
-.save-episodes:hover {
-    cursor: pointer;
-    background: $color-menu
-}
-
 .delete {
+    opacity: 0;
     cursor: pointer;
-    width: 30px;
-    height: 30px;
-    background-color: $color-bright;
+    width: 3rem;
+    height: 3rem;
+    background-color: $color-light;
     -webkit-mask: url('./assets/icons/delete.svg') no-repeat center;
     mask: url('./assets/icons/delete.svg') no-repeat center;
 }
 
-.delete:hover {
-    background-color: aqua;
-    border: 2px solid $color-bright;
+.delete:hover,
+.rename:hover {
+    background-color: $color-menu;
 }
 
 .rename {
+    opacity: 0;
     cursor: pointer;
-    width: 30px;
-    height: 30px;
-    background-color: $color-bright;
+    width: 3rem;
+    height: 3rem;
+    background-color: $color-light;
     -webkit-mask: url('./assets/icons/edit.svg') no-repeat center;
     mask: url('./assets/icons/edit.svg') no-repeat center;
-}
-
-.rename:hover {
-    background-color: aqua;
-    border: 2px solid $color-bright;
 }
 
 .owner {
@@ -79,37 +71,44 @@
     justify-self: end;
     opacity: 0;
 }
+
 .input-rename {
     width: 18rem;
 }
+
 .playlist {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    background-color: $color-bright-light;
+    background: linear-gradient($color-bright-light, $color-bright);
     width: 20rem;
     height: 30rem;
     border-radius: $radius;
     padding: 1rem;
-    color: $color-dark;
-    &:hover .owner {
+    color: $color-light;
+    cursor: pointer;
+
+    &:hover .delete,
+    &:hover .rename {
         opacity: 1;
     }
 }
 
-.playlist:hover {
-    background-color: $color-menu
-}
-
 .playlist__image {
-    width: 18rem;
-    height: 20rem;
+    padding-top: 2rem;
     align-self: center;
+    width: 70%;
+    height: 50%;
     border-radius: $radius;
 }
 
-.playlist__name__wrapper {
+.name__wrapper {
+    min-height: 3rem;
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.edit__wrapper {
+    display: flex;
 }
