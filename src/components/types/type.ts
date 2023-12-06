@@ -1,4 +1,4 @@
-type podcastCard = {
+export type PodcastCard = {
     categories: object;
     description: string;
     id: number;
@@ -11,7 +11,7 @@ type podcastCard = {
     url: string;
 };
 
-type episode = {
+export type Episode = {
     // chaptersUrl: null,
     dateCrawled: number;
     datePublished: number;
@@ -42,8 +42,6 @@ type episode = {
 
 export type OnRangeInput = (event: Event) => void;
 
-export { podcastCard, episode };
-
 export enum PlayerButtons {
     Play = 'play',
     Pause = 'pause',
@@ -57,16 +55,16 @@ export enum PlayerButtons {
 export type OnClickPlayerButton = (event: Event) => void;
 export type OnReloadPage = (id: number | string) => void;
 export type OnClickPodcastCard = (podcastId: number) => void;
-export type onClickEpisodeCard = (episodeId: number) => void;
+export type OnClickEpisodeCard = (episodeId: number) => void;
 export type onClickSavedPlaylist = (playlistName: string) => void;
 export type OnChangeSearchValue = (value: string) => void;
 export type OnClickPlayButton = (episodeId: number, event: Event) => void;
 export type OnClickLink = (path: string) => void;
 export type OnClickAccountsBtn = (btnText: string) => void;
-export type OnClickAction = (type: ActionsButtons, event: Event) => void;
+export type OnClickAction = (type: ActionsButtons, event: MouseEvent) => void;
 
 
-export type user = {
+export type User = {
     userName: string;
     userPassword: string;
     email: string;
@@ -76,7 +74,7 @@ export type user = {
 export type PodcastsJson = {
     count: number,
     description: string,
-    feeds: podcastCard[],
+    feeds: PodcastCard[],
     max: string,
     since: string,
     status: string,
@@ -85,14 +83,14 @@ export type PodcastsJson = {
 export type SearchJson = {
     count: number,
     description: string,
-    feeds: podcastCard[],
+    feeds: PodcastCard[],
     query: string,
     status: string,
 }
 
 export type PodcastJson = {
     description: string,
-    feed: podcastCard,
+    feed: PodcastCard,
     query: {id: string},
     status: string,
 }
@@ -100,15 +98,15 @@ export type PodcastJson = {
 export type EpisodesJson = {
     count: number,
     description: string,
-    items: episode[],
-    liveItems: episode[],
+    items: Episode[],
+    liveItems: Episode[],
     query: string,
     status: string,
 };
 
 export type EpisodeJson = {
     description: string,
-    episode: episode,
+    episode: Episode,
     id: string,
     status: string,
 };
@@ -127,5 +125,5 @@ export type StorageEpisode = {
 export enum ActionsButtons {
     Share = 'share',
     Save = 'save',
-    More = 'more',
+    Download = 'download',
 }

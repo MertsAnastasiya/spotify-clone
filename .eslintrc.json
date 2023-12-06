@@ -21,6 +21,7 @@
         "no-console": 0,
         "class-methods-use-this": "off",
         "no-var": "error",
-        "semi": "error"
+        "semi": "error",
+        "no-case-declarations": "off"
     }
 }

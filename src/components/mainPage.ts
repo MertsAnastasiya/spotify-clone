@@ -1,15 +1,9 @@
 import mainPageDOM from './templates/mainPageDom';
+import { querySelectNonNull } from './utils';
 
 export default class MainPage {
-
-    private addStructure() {
-        const body = document.querySelector('body');
-        if (body) {
-            body.innerHTML = mainPageDOM;
-        }
-    }
-
-    public draw() {
-        this.addStructure();
+    public draw(): void {
+        const body: HTMLElement = querySelectNonNull('body');
+        body.innerHTML = mainPageDOM;
     }
 }

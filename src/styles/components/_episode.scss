@@ -6,7 +6,7 @@
     display: flex;
     align-items: center;
     gap: 2rem;
-    padding: 1rem 1rem 3rem 1rem;
+    padding: 1rem;
     border-bottom: 1px solid $color-additional-light;
     border-radius: $radius;
     position: relative;
@@ -32,20 +32,28 @@
     display: none;
 }
 
-.actions_spoti { //onmouseover
+.episode-actions__wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+}
+
+.hidden {
+    opacity: 0;
+}
+
+.actions_spoti {
+    position: relative;
     display: flex;
     gap: 1rem;
-    position: absolute;
-    right: 0;
-    bottom: 0.7rem;
-    opacity: 0;
+    // opacity: 0;
 }
 
 .episode__image_spoti {
     width: 15rem;
     height: 15rem;
     border-radius: $radius;
-    border: 1px solid $color-bright; //delete at the end
 
     @include media-mobile {
         display: none;
@@ -83,16 +91,17 @@
     cursor: pointer;
 }
 
-.save {
+.button_save {
     -webkit-mask: url('./assets/icons/save.svg') no-repeat center;
     mask: url('./assets/icons/save.svg') no-repeat center;
 }
-.saved {
+
+.button_saved {
     -webkit-mask: url('./assets/icons/saved.svg') no-repeat center;
     mask: url('./assets/icons/saved.svg') no-repeat center;
 }
 
-.share {
+.button_share {
     -webkit-mask: url('./assets/icons/copy.svg') no-repeat center;
     mask: url('./assets/icons/copy.svg') no-repeat center;
 }

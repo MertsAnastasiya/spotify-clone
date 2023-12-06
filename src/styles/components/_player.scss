@@ -190,7 +190,7 @@
 
 .player__podcast-data {
     display: flex;
-    justify-content: space-between;
+    // justify-content: space-between;
     gap: 1rem;
     align-items: center;
     @include font($size: 1.5rem);

@@ -1,19 +1,26 @@
 import Controller from './controller';
 import { EpisodesListItem } from './episodesListItem';
-import { onClickEpisodeCard, OnClickPlayButton } from './types/type';
+import { OnClickAction, OnClickEpisodeCard, OnClickPlayButton, ActionsButtons } from './types/type';
 
 export class EpisodeList {
     private podcastId: number;
 
     private readonly controller: Controller;
-    private readonly onClickEpisodeCard: onClickEpisodeCard;
+    private readonly onClickEpisodeCard: OnClickEpisodeCard;
     private readonly onClickPlayButton: OnClickPlayButton;
+    private readonly onClickAction: OnClickAction;
 
-    constructor(podcatId: number, onClickEpisodeCard: onClickEpisodeCard, onClickPlayButton: OnClickPlayButton) {
+    constructor(
+        podcatId: number,
+        onClickEpisodeCard: OnClickEpisodeCard,
+        onClickPlayButton: OnClickPlayButton,
+        onClickAction: OnClickAction,
+    ) {
         this.podcastId = podcatId;
         this.controller = new Controller();
         this.onClickEpisodeCard = onClickEpisodeCard;
         this.onClickPlayButton = onClickPlayButton;
+        this.onClickAction = onClickAction;
     }
 
     public createList(): Element {
@@ -34,7 +41,12 @@ export class EpisodeList {
         this.controller.fetchEpisodesById(this.podcastId).then((data) =>
             data.forEach((item, index) => {
                 if (index === 0) {
-                    const episode: Element = new EpisodesListItem(parent, this.onClickEpisodeCard.bind(this, item.id), (id: number, event: Event) => this.onClickPlayButton(id, event)).createEpisode(item);
+                    const episode: Element = new EpisodesListItem(
+                        parent,
+                        this.onClickEpisodeCard.bind(this, item.id),
+                        (id: number, event: Event) => this.onClickPlayButton(id, event),
+                        (action: ActionsButtons, event) => this.onClickAction(action, event),
+                    ).createEpisode(item);
                     episode.classList.add('episode_latest');
                     parent.appendChild(episode);
 
@@ -44,7 +56,12 @@ export class EpisodeList {
                     listHeader.textContent = 'Episodes';
                     parent.appendChild(listHeader);
                 } else {
-                    new EpisodesListItem(parent, this.onClickEpisodeCard.bind(this,item.id), (id: number, event: Event) => this.onClickPlayButton(id, event)).createEpisode(item);
+                    new EpisodesListItem(
+                        parent,
+                        this.onClickEpisodeCard.bind(this, item.id),
+                        (id: number, event: Event) => this.onClickPlayButton(id, event),
+                        (type: ActionsButtons, event: Event) => this.onClickAction(type, event as MouseEvent),
+                    ).createEpisode(item);
                 }
             })
         );

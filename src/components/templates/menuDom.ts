@@ -7,11 +7,11 @@ const menuDOM = `
       <input class="menu__search search" type="search" placeholder="Search">
       <nav class="menu__nav">
         <ul class="menu__list">
-          <a class="menu__item active" href="/#home">
+          <a class="link menu__item" href="/#home">
             <span class="menu__item-logo home"></span>
             <p class="menu__item-text">Home</p>
           </a>
-          <a class="menu__item" href="/#library">
+          <a class="link menu__item" href="/#library">
             <span class="menu__item-logo library"></span>
             <p class="menu__item-text">Library</p>
           </a>

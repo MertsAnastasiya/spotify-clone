@@ -1,9 +1,9 @@
-import { podcastCard, episode, PodcastsJson, SearchJson, PodcastJson, EpisodesJson, EpisodeJson, StorageEpisode } from './types/type';
+import { PodcastCard, Episode, PodcastsJson, SearchJson, PodcastJson, EpisodesJson, EpisodeJson, StorageEpisode } from './types/type';
 import { IController } from './types/interfaces';
-import { PodcastStorage } from './storage';
+import { AppStorage } from './storage';
 
 class Loader {
-    public storage = new PodcastStorage();
+    public storage = new AppStorage();
 
     private async getAuthorizationHeaderValue(
         apiKey: string,
@@ -26,7 +26,7 @@ class Loader {
         return requestHeaders;
     }
 
-    async fetchRecent(apiKey: string, apiSecret: string): Promise<podcastCard[]> {
+    async fetchRecent(apiKey: string, apiSecret: string): Promise<PodcastCard[]> {
         const url: string = 'https://api.podcastindex.org/api/1.0/recent/feeds?max=12';
 
         const apiHeaderTime: string = '' + Math.round(Date.now() / 1_000);
@@ -38,7 +38,7 @@ class Loader {
             .then((json: PodcastsJson) => json.feeds);
     }
 
-    async fetchSearchCall(qString: string, apiKey: string, apiSecret: string): Promise<podcastCard[]> {
+    async fetchSearchCall(qString: string, apiKey: string, apiSecret: string): Promise<PodcastCard[]> {
         const url: string = `https://api.podcastindex.org/api/1.0/search/byterm?q=${qString}&pretty`;
         const apiHeaderTime: string = '' + Math.round(Date.now() / 1_000);
         return this.getAuthorizationHeaderValue(apiKey, apiSecret, apiHeaderTime)
@@ -48,7 +48,7 @@ class Loader {
             .then((res: Response) => res.json())
             .then((json: SearchJson) => json.feeds);
     }
-    fetchById(id: number, apiKey: string, apiSecret: string): Promise<podcastCard> {
+    fetchById(id: number, apiKey: string, apiSecret: string): Promise<PodcastCard> {
         const url: string = `https://api.podcastindex.org/api/1.0/podcasts/byfeedid?id=${id}&pretty`;
         const apiHeaderTime: string = '' + Math.round(Date.now() / 1_000);
         return this.getAuthorizationHeaderValue(apiKey, apiSecret, apiHeaderTime)
@@ -59,7 +59,7 @@ class Loader {
             .then((json: PodcastJson) => json.feed);
     }
 
-    fetchEpisodesById(id: number, apiKey: string, apiSecret: string): Promise<episode[]> {
+    fetchEpisodesById(id: number, apiKey: string, apiSecret: string): Promise<Episode[]> {
         const url: string = `https://api.podcastindex.org/api/1.0/episodes/byfeedid?id=${id}&pretty`;
         const apiHeaderTime: string = '' + Math.round(Date.now() / 1_000);
         return this.getAuthorizationHeaderValue(apiKey, apiSecret, apiHeaderTime)
@@ -77,7 +77,7 @@ class Loader {
             });
     }
 
-    fetchEpisodeById(id: number, apiKey: string, apiSecret: string): Promise<episode> {
+    fetchEpisodeById(id: number, apiKey: string, apiSecret: string): Promise<Episode> {
         const url: string = `https://api.podcastindex.org/api/1.0/episodes/byid?id=${id}&pretty`;
         const apiHeaderTime: string = '' + Math.round(Date.now() / 1_000);
         return this.getAuthorizationHeaderValue(apiKey, apiSecret, apiHeaderTime)
@@ -88,7 +88,7 @@ class Loader {
             .then((json: EpisodeJson) => json.episode);
     }
 
-    async fetchDataForUpdatePlayer(apiKey: string, apiSecret: string): Promise<episode> {
+    async fetchDataForUpdatePlayer(apiKey: string, apiSecret: string): Promise<Episode> {
         const apiHeaderTime: string = '' + Math.round(Date.now() / 1_000);
         const authorization: string = await this.getAuthorizationHeaderValue(apiKey, apiSecret, apiHeaderTime);
         const headers: HeadersInit = this.getHeaders(apiHeaderTime, apiKey, authorization);
@@ -108,22 +108,22 @@ class Controller implements IController {
         this.apiKey = 'JYJTF9FGRUAZ4CCJAYKF';
         this.apiSecret = 'zCYDzHZjM8u$rkyqTUHTVbHKUTgw88B8htJpmz#$';
     }
-    fetchById(id: number): Promise<podcastCard> {
+    fetchById(id: number): Promise<PodcastCard> {
         return new Loader().fetchById(id, this.apiKey, this.apiSecret);
     }
-    fetchEpisodesById(id: number): Promise<episode[]> {
+    fetchEpisodesById(id: number): Promise<Episode[]> {
         return new Loader().fetchEpisodesById(id, this.apiKey, this.apiSecret);
     }
-    fetchEpisodeById(id: number): Promise<episode> {
+    fetchEpisodeById(id: number): Promise<Episode> {
         return new Loader().fetchEpisodeById(id, this.apiKey, this.apiSecret);
     }
-    fetchSearchCall(qString: string): Promise<podcastCard[]> {
+    fetchSearchCall(qString: string): Promise<PodcastCard[]> {
         return new Loader().fetchSearchCall(qString, this.apiKey, this.apiSecret);
     }
-    fetchRecent(): Promise<podcastCard[]> {
+    fetchRecent(): Promise<PodcastCard[]> {
         return new Loader().fetchRecent(this.apiKey, this.apiSecret);
     }
-    fetchDataForUpdatePlayer(): Promise<episode> {
+    fetchDataForUpdatePlayer(): Promise<Episode> {
         return new Loader().fetchDataForUpdatePlayer(this.apiKey, this.apiSecret);
     }
 }

@@ -1,20 +1,20 @@
-import { Library } from './api/libraryController';
+// import { Library } from './api/libraryController';
 import Controller from './controller';
-import { OnClickPlayButton, OnClickPodcastCard, UserLibrary } from './types/type';
+import { OnClickPlayButton, OnClickPodcastCard } from './types/type';
 import { replaceTags, requiresNonNull } from './utils';
-import { EMAIL } from './constants';
+// import { EMAIL } from './constants';
 import { LibraryNavigation } from './libraryNavigation';
 
 export default class SubscriptionPage {
     private readonly controller: Controller;
     private readonly onClickPodcastCard: OnClickPodcastCard;
     private readonly onClickPlayButton: OnClickPlayButton;
-    private readonly library: Library;
+    // private readonly library: Library;
 
     constructor(onClickPodcastCard: OnClickPodcastCard, onClickPlayButton: OnClickPlayButton) {
         this.onClickPodcastCard = onClickPodcastCard;
         this.onClickPlayButton = onClickPlayButton;
-        this.library = new Library(EMAIL);
+        // this.library = new Library(EMAIL);
         this.controller = new Controller();
     }
 
@@ -62,9 +62,9 @@ export default class SubscriptionPage {
             deleteButton.style.right = '1rem';
             deleteButton.addEventListener('click', (event)=>{
                 event.stopPropagation();
-                this.library.removeItemFromPlaylist('subscribedPodcasts', data.id.toString()).then(()=>{
-                    setTimeout(()=>this.draw(), 1000);
-                });
+                // this.library.removeItemFromPlaylist('subscribedPodcasts', data.id.toString()).then(()=>{
+                //     setTimeout(()=>this.draw(), 1000);
+                // });
             });
 
             const playButton: Element = document.createElement('div');
@@ -97,12 +97,12 @@ export default class SubscriptionPage {
     public draw(): void {
         this.addStructure();
         this.changeTitle();
-        this.library.userLibrary().then((data) => {
-            const subscriptions = (data as UserLibrary).subscribedPodcasts;
-            subscriptions.forEach((elem) => {
-                this.drawCard(Number(elem.id));
-                this.setDefaultImage();
-            });
-        });
+        // this.library.userLibrary().then((data) => {
+        //     const subscriptions = (data as UserLibrary).subscribedPodcasts;
+        //     subscriptions.forEach((elem) => {
+        //         this.drawCard(Number(elem.id));
+        //         this.setDefaultImage();
+        //     });
+        // });
     }
 }

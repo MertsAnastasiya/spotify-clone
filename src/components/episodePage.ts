@@ -1,5 +1,5 @@
 import Controller from './controller';
-import { episode, OnClickPlayButton, OnClickPodcastCard } from './types/type';
+import { Episode, OnClickPlayButton, OnClickPodcastCard } from './types/type';
 import { replaceTags, requiresNonNull } from './utils';
 
 export class EpisodePage {
@@ -17,7 +17,7 @@ export class EpisodePage {
         this.isPlay = isPlay;
     }
 
-    public draw(data: episode): void {
+    public draw(data: Episode): void {
         const episode: Element = document.createElement('div');
         episode.classList.add('episodeContent');
 

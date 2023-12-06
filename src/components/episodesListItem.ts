@@ -1,22 +1,21 @@
-import { episode, onClickEpisodeCard, OnClickPlayButton } from './types/type';
+import { AppStorage } from './storage';
+import { ActionsButtons, Episode, OnClickAction, OnClickEpisodeCard, OnClickPlayButton } from './types/type';
 import { formatTime, replaceTags } from './utils';
-import { Library } from './api/libraryController';
-import { EMAIL } from './constants';
 
 export class EpisodesListItem {
     private readonly parent: Element;
-    private readonly onClickEpisodeCard: onClickEpisodeCard;
-    private readonly library: Library;
+    private readonly onClickEpisodeCard: OnClickEpisodeCard;
     private readonly onClickPlayButton: OnClickPlayButton;
+    private readonly onClickAction: OnClickAction;
 
-    constructor(parent: Element, onClickEpisodeCard: onClickEpisodeCard, onClickPlayButton: OnClickPlayButton) {
+    constructor(parent: Element, onClickEpisodeCard: OnClickEpisodeCard, onClickPlayButton: OnClickPlayButton, onClickAction: OnClickAction) {
         this.parent = parent;
         this.onClickEpisodeCard = onClickEpisodeCard;
-        this.library = new Library(EMAIL);
         this.onClickPlayButton = onClickPlayButton;
+        this.onClickAction = onClickAction;
     }
 
-    public createEpisode(data: episode): Element {
+    public createEpisode(data: Episode): Element {
         const episode: HTMLElement = document.createElement('div');
         episode.classList.add('episode');
         episode.dataset.id = data.id.toString();
@@ -25,6 +24,7 @@ export class EpisodesListItem {
         episode.appendChild(this.createEpisodeInfo(data));
         episode.addEventListener('click', this.onClickEpisodeCard.bind(this, data.id));
         this.parent.appendChild(episode);
+
         return episode;
     }
 
@@ -37,7 +37,7 @@ export class EpisodesListItem {
         return episodeImage;
     }
 
-    private createEpisodeInfo(data: episode): Element {
+    private createEpisodeInfo(data: Episode): Element {
         const episodeInfo: Element = document.createElement('div');
 
         const episodeTitle: Element = document.createElement('h4');
@@ -50,8 +50,12 @@ export class EpisodesListItem {
 
         episodeInfo.appendChild(episodeTitle);
         episodeInfo.appendChild(episodeDescription);
-        episodeInfo.appendChild(this.createEpisodePlayer(data.duration, data.id));
-        episodeInfo.appendChild(this.createActionsButton(data.id));
+
+        const wrapper: Element = document.createElement('div');
+        wrapper.classList.add('episode-actions__wrapper');
+        wrapper.append(this.createEpisodePlayer(data.duration, data.id));
+        wrapper.append(this.createActionsButton(data.id));//???
+        episodeInfo.append(wrapper);
 
         return episodeInfo;
     }
@@ -90,56 +94,60 @@ export class EpisodesListItem {
         return player;
     }
 
-    private createActionsButton(episodeId: number): Element {
+    private createActionsButton(dataId: number): Element {
         const wrapper: Element = document.createElement('div');
         wrapper.classList.add('actions_spoti');
+        wrapper.classList.add('hidden');
 
         const shareButton: Element = document.createElement('div');
         shareButton.classList.add('button_action');
-        shareButton.classList.add('share');
+        shareButton.classList.add('button_share');
+        shareButton.addEventListener('click', (event: Event) => this.onClickAction(ActionsButtons.Share, event as MouseEvent));
 
         const saveButton: HTMLElement = document.createElement('div');
         saveButton.classList.add('button_action');
-        const path = window.location.hash.split('/');
-        if (path[0] === '#saved' || path[0] === '#savedPodcast')
-        {
-            saveButton.dataset.id = episodeId.toString();
-            saveButton.classList.add('saved');
-            saveButton.addEventListener('click', (event) => {
-                event.stopPropagation();
-                const playlistName = path[0] === '#saved' ? 'likedPodcasts' : (path[1] as string).replace(/(%20)/g, ' ');
-                this.library.removeItemFromPlaylist(playlistName, saveButton.dataset.id as string)
-                .then(()=>{
-                    setTimeout(()=> {
-                        window.location.href = path.join('/');
-                    }, 1000);
-                })
-                ;
-            });
-        }
-        else
-        {
-            saveButton.classList.add('save');
-        }
+        const appStorage: AppStorage = new AppStorage();
+        const currentUser: string = appStorage.getCurrentUser();
+        const savedEpisodes: number[] = appStorage.getSavedEpisode(currentUser);
+        savedEpisodes.includes(dataId) ?  saveButton.classList.add('button_saved') : saveButton.classList.add('button_save');
 
+        saveButton.addEventListener('click', (event: MouseEvent) => {
+            event.stopPropagation();
+            saveButton.classList.toggle('button_save');
+            saveButton.classList.toggle('button_saved');
+            this.onClickAction(ActionsButtons.Save, event);
+        });
+        // const path = window.location.hash.split('/');
+        // if (path[0] === '#saved' || path[0] === '#savedPodcast')
+        // {
+        //     saveButton.dataset.id = episodeId.toString();
+        //     saveButton.classList.add('saved');
+        //     saveButton.addEventListener('click', (event) => {
+        //         event.stopPropagation();
+        //         const playlistName = path[0] === '#saved' ? 'likedPodcasts' : (path[1] as string).replace(/(%20)/g, ' ');
+        //         this.library.removeItemFromPlaylist(playlistName, saveButton.dataset.id as string)
+        //         .then(()=>{
+        //             setTimeout(()=> {
+        //                 window.location.href = path.join('/');
+        //             }, 1000);
+        //         })
+        //         ;
+        //     });
+        // }
+        // else
+        // {
+        //     saveButton.classList.add('save');
+        // }
 
-        const moreButton: Element = document.createElement('div');
-        moreButton.classList.add('button_action');
-        moreButton.classList.add('download');
+        const downloadButton: Element = document.createElement('div');
+        downloadButton.classList.add('button_action');
+        downloadButton.classList.add('download');
+        downloadButton.addEventListener('click', (event: Event) => this.onClickAction(ActionsButtons.Download, event as MouseEvent));
 
         wrapper.appendChild(shareButton);
         wrapper.appendChild(saveButton);
-        wrapper.appendChild(moreButton);
+        wrapper.appendChild(downloadButton);
 
         return wrapper;
     }
-
-//     private getTime(duration: number): string {
-//         const hours: number =  duration >= 3600 ? Math.floor(duration / 3600) : 0;
-//         const hoursStr: string = hours !== 0 ? `${hours} hr ` : ``;
-//         const minutes: number = Math.floor((duration - hours * 3600) / 60);
-//         const seconds: number = Math.floor(duration - hours * 3600 - minutes * 60);
-//
-//         return `${hoursStr} ${minutes} min ${seconds} sec`;
-//     }
 }

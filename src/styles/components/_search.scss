@@ -5,6 +5,7 @@
   border-radius: $radius;
   outline: none;
   width: 100%;
+  position: relative;
 
   &:focus {
     background-color: $color-bright-light;

@@ -1,32 +1,31 @@
 import Controller from './controller';
-import { EpisodesListItem } from './episodesListItem';
-import { UserLibrary, onClickEpisodeCard, OnClickPlayButton, StorageEpisode } from './types/type';
+import { OnClickEpisodeCard, OnClickPlayButton, OnClickAction, ActionsButtons, StorageEpisode } from './types/type';
 import { querySelectNonNull } from './utils';
-import { Library } from './api/libraryController';
-import { EMAIL } from './constants';
-import { PodcastStorage } from './storage';
+import { AppStorage } from './storage';
+import { EpisodesListItem } from './episodesListItem';
 
 export class LibraryEpisodes {
     private readonly controller: Controller;
-    private readonly onClickEpisodeCard: onClickEpisodeCard;
+    private readonly onClickEpisodeCard: OnClickEpisodeCard;
     private readonly onClickPlayButton: OnClickPlayButton;
-    private readonly library: Library;
+    private readonly onClickAction: OnClickAction;
     private readonly playlistName: string;
-    public storage = new PodcastStorage();
+    public storage = new AppStorage();
 
     constructor(
-        onClickEpisodeCard: onClickEpisodeCard,
+        onClickEpisodeCard: OnClickEpisodeCard,
         onClickPlayButton: OnClickPlayButton,
+        onClickAction: OnClickAction,
         playlistName = 'likedPodcasts'
     ) {
         this.controller = new Controller();
         this.onClickEpisodeCard = onClickEpisodeCard;
-        this.library = new Library(EMAIL);
         this.playlistName = playlistName;
         this.onClickPlayButton = onClickPlayButton;
+        this.onClickAction = onClickAction;
     }
 
-    public async draw() {
+    public async draw(): Promise<void> {
         const mainContainer: Element = querySelectNonNull<Element>('.main__container');
         mainContainer.innerHTML = '';
 
@@ -52,13 +51,13 @@ export class LibraryEpisodes {
         title.classList.add('h1');
         title.textContent = this.playlistName === 'likedPodcasts' ? 'Your Liked Episodes' : this.playlistName;
 
-        const creator: Element = document.createElement('div');
-        creator.classList.add('creator');
-        creator.textContent = `UserName • 2 episodes`;
+        // const creator: Element = document.createElement('div');
+        // creator.classList.add('creator');
+        // creator.textContent = `UserName • 2 episodes`;
 
         header.appendChild(imageWrapper);
         info.appendChild(title);
-        info.appendChild(creator);
+        // info.appendChild(creator);
         header.appendChild(info);
 
         return header;
@@ -66,25 +65,22 @@ export class LibraryEpisodes {
 
     private createList(): Element {
         const wrapper: Element = document.createElement('div');
-        const creator = document.querySelector('.creator') as HTMLElement;
-        this.library.userLibrary().then((res) => {
-            const userLibraryObj = res as UserLibrary;
-            console.log(userLibraryObj.email);
-            const array: Array<{ id: number }> = userLibraryObj[this.playlistName];
-            creator.innerText = array.length === 1 ? `${userLibraryObj.email} • 1 episode` : `${userLibraryObj.email} • ${array.length} episodes`;
-            const episodeOrder: StorageEpisode[] = [];
-            array.forEach((item) => {
-                this.controller.fetchEpisodeById(item.id).then((data) => {
-                    episodeOrder.push({ id: data.id, currentDuration: 0 });
-                    this.storage.setEpisodeOrder(episodeOrder);
-                    return new EpisodesListItem(
-                        wrapper,
-                        (episodeId: number) => this.onClickEpisodeCard(episodeId),
-                        (episodeId: number, event: Event) => this.onClickPlayButton(episodeId, event)
-                    ).createEpisode(data);
-                });
+        const appStorage = new AppStorage();
+        const array = appStorage.getSavedEpisode(appStorage.getCurrentUser());
+        const episodeOrder: StorageEpisode[] = [];
+        array.forEach((item) => {
+            this.controller.fetchEpisodeById(item).then((data) => {
+                episodeOrder.push({ id: data.id, currentDuration: 0 });
+                this.storage.setEpisodeOrder(episodeOrder);
+                return new EpisodesListItem(
+                    wrapper,
+                    (episodeId: number) => this.onClickEpisodeCard(episodeId),
+                    (episodeId: number, event: Event) => this.onClickPlayButton(episodeId, event),
+                    (type: ActionsButtons, event: Event) => this.onClickAction(type, event as MouseEvent)
+                ).createEpisode(data);
             });
         });
+
         return wrapper;
     }
 }
