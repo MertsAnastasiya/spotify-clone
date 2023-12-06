@@ -1,0 +1,24 @@
+.playlist-menu {
+    display: block;
+    border-radius: $radius;
+    width: 20rem;
+    position: absolute;
+    border: 3px solid red;
+    background-color: $color-not-active;
+}
+
+.playlist-menu__item {
+    width: 100%;
+    color: $color-dark;
+    border-radius: $radius;
+    padding: 0.5rem;
+
+    &:hover {
+        color: $color-light;
+        background-color: $color-bright;
+    }
+}
+
+.hidden {
+    opacity: 0;
+}

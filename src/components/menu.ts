@@ -19,7 +19,6 @@ class Menu {
     }
 
     private addListeners(): void {
-        const menuInner = document.querySelector('.menu__inner') as HTMLElement;
         const menuSearch = document.querySelector('.menu__search') as HTMLInputElement;
         let delay = setTimeout(() => {
             // this.onChangeSearchValue(menuSearch.value);
@@ -38,16 +37,6 @@ class Menu {
             delay = setTimeout(() => {
                 this.onChangeSearchValue(menuSearch.value);
             }, 1000);
-        });
-
-        menuInner.addEventListener('click', (event) => {
-            if ((event.target as HTMLElement).innerText === 'Your Library') {
-                this.onClickLink('library');
-            } else if ((event.target as HTMLElement).innerText === 'Home') {
-                // TO DO
-                // go to home
-                console.log('Go to Home');
-            }
         });
     }
 }

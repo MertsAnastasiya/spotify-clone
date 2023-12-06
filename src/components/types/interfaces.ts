@@ -1,4 +1,4 @@
-import { user } from './type';
+import { User } from './type';
 
 interface IController {
     fetchRecent(): void;
@@ -17,12 +17,12 @@ interface IAuthentication {
 }
 
 interface IRegestration {
-    addUser(newUser: user): void;
+    addUser(newUser: User): void;
 }
 
 interface IAuthorization {
     signOut(): void;
-    updateUser(updateFields: user): void;
+    updateUser(updateFields: User): void;
     deleteUser(): void;
 }
 

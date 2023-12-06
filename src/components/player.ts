@@ -1,6 +1,6 @@
 import Controller from './controller';
-import { PodcastStorage } from './storage';
-import { episode, OnClickPlayerButton, OnRangeInput } from './types/type';
+import { AppStorage } from './storage';
+import { Episode, OnClickPlayerButton, OnRangeInput } from './types/type';
 import { changeRangeBackground, querySelectNonNull } from './utils';
 
 export class Player {
@@ -10,7 +10,7 @@ export class Player {
     public readonly audio: HTMLAudioElement;
     public isPlay: boolean = false;
     private readonly controller: Controller = new Controller();
-    public readonly storage = new PodcastStorage();
+    public readonly storage = new AppStorage();
 
     constructor(onRangeInput: OnRangeInput, onClickPlayerButton: OnClickPlayerButton, changeStatusPlayButton: (id: string, isPlay: boolean) => void) {
         this.audio = document.createElement('audio');
@@ -292,7 +292,7 @@ export class Player {
         });
     }
 
-    private updateData(data: episode) {
+    private updateData(data: Episode) {
         this.storage.setLastListened({'id': data.id, 'currentDuration': this.audio.currentTime});
         this.audio.src = data.enclosureUrl;
         this.audio.setAttribute('data-id', `${data.id}`);

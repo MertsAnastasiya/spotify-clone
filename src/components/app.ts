@@ -12,10 +12,9 @@ import Footer from './footer';
 import { LibraryPage } from './libraryPage';
 import { LibraryEpisodes } from './libraryEpisodes';
 
-import AccountBtns from './accountBtns';
-import Popups from './popups';
+// import Login from './sighIn';
 import SubscriptionPage from './subscriptionsPage';
-import { PodcastStorage } from './storage';
+import { AppStorage } from './storage';
 import Controller from './controller';
 
 export class App {
@@ -23,10 +22,11 @@ export class App {
     private readonly router: Router;
     private readonly mainPage: MainPage;
     private readonly menu: Menu;
-    private readonly accountBtns: AccountBtns;
+    // private readonly accountBtns: Login;
     private readonly footer: Footer;
     private readonly cards: Cards;
     private readonly subscriptionPage: SubscriptionPage;
+    private readonly appStorage: AppStorage = new AppStorage();
 
     constructor() {
         this.player = new Player(
@@ -34,10 +34,12 @@ export class App {
             (event) => this.onClickPlayerButton(event),
             (id: string, isPlay: boolean) => this.changeStatusPlayButton(id, isPlay)
         );
+
         this.subscriptionPage = new SubscriptionPage(
             (id: number) => this.onClickPodcastCard(id),
             (id: number, event: Event) => this.onClickPlayButton(id, event)
         );
+
         this.router = new Router();
         this.mainPage = new MainPage();
 
@@ -45,7 +47,12 @@ export class App {
             (inputValue: string) => this.onChangeSearchValue(inputValue),
             (path: string) => this.onClickLink(path)
         );
-        this.accountBtns = new AccountBtns((btnText: string) => this.onCLickAccountsBtn(btnText));
+
+        // this.accountBtns =
+        //     this.appStorage.getCurrentUser() !== null
+        //         ? new Login((email: string) => this.onClickAccount(email), this.appStorage.getCurrentUser())
+        //         : new Login((email: string) => this.onClickAccount(email), '');
+
         this.footer = new Footer();
         this.cards = new Cards(
             (id: number) => this.onClickPodcastCard(id),
@@ -58,7 +65,7 @@ export class App {
         new Header().draw();
         this.player.draw();
         this.menu.drawMenu();
-        this.accountBtns.draw();
+        // this.accountBtns.draw();
         this.footer.draw();
 
         this.createBasicRoutes();
@@ -70,6 +77,7 @@ export class App {
     private createBasicRoutes() {
         this.router.addRoute('/', () => this.onLoadMainPage());
         this.router.addRoute('subscriptionsList', () => this.onLoadSubscriptionsPage());
+        this.router.addRoute('playlistsList', () => this.onLoadLibraryPage());
         this.router.addRoute('home', () => this.onLoadMainPage());
         this.router.addRoute('podcast', (podcastId: number | string) => this.onLoadPodcastPage(podcastId));
         this.router.addRoute('episode', (episodeId: number | string) => this.onLoadEpisodePage(episodeId));
@@ -125,24 +133,20 @@ export class App {
         this.cards.draw(searchString);
     }
 
-    private onCLickAccountsBtn(btnText: string): void {
-        new Popups(btnText).draw();
-    }
-
     private onClickPodcastCard(podcastId: number): void {
         this.router.updateUrl(`/#podcast/${podcastId}`);
     }
 
     private onLoadPodcastPage(podcastId: number | string): void {
-        const podcastID = podcastId as number;
+        const podcastID: number = podcastId as number;
         new PodcastPage(
             podcastID,
             Number(this.player.audio.getAttribute('data-id')),
             this.player.isPlay,
             (episodeId: number) => this.onClickEpisodeCard(episodeId),
             (episodeId: number, event: Event) => this.onClickPlayButton(episodeId, event),
-            (type: ActionsButtons, event: Event) => this.OnClickAction(type, event)
-        ).drawPodcastPage('spotify');
+            (type: ActionsButtons, event: Event) => this.onClickAction(type, event as MouseEvent)
+        ).draw();
     }
 
     private onClickEpisodeCard(episodeId: number): void {
@@ -172,7 +176,7 @@ export class App {
             target.classList.toggle('pause');
         }
 
-        const storage: PodcastStorage = new PodcastStorage();
+        const storage: AppStorage = new AppStorage();
         const arrayStart: StorageEpisode[] = storage.getEpisodeOrder();
         const arrayPrevs: StorageEpisode[] = [];
         const arrayNexts: StorageEpisode[] = [];
@@ -208,7 +212,8 @@ export class App {
     private onLoadLibraryEpisodes(): void {
         new LibraryEpisodes(
             (episodeId: number) => this.onClickEpisodeCard(episodeId),
-            (episodeId: number, event: Event) => this.onClickPlayButton(episodeId, event)
+            (episodeId: number, event: Event) => this.onClickPlayButton(episodeId, event),
+            (type: ActionsButtons, event: Event) => this.onClickAction(type, event as MouseEvent)
         ).draw();
     }
 
@@ -217,6 +222,7 @@ export class App {
         new LibraryEpisodes(
             (episodeId: number) => this.onClickEpisodeCard(episodeId),
             (episodeId: number, event: Event) => this.onClickPlayButton(episodeId, event),
+            (type: ActionsButtons, event: Event) => this.onClickAction(type, event as MouseEvent),
             playlistNAME
         ).draw();
     }
@@ -233,9 +239,10 @@ export class App {
         isPlay ? playButton.classList.add('pause') : playButton.classList.remove('pause');
     }
 
-    private OnClickAction(type: ActionsButtons, event: Event) {
+    private onClickAction(type: ActionsButtons, event: MouseEvent) {
+        event.stopPropagation();
         const target: Element = event.target as Element;
-        const episodeId: string | null = requiresNonNull(target.closest('.episode')).getAttribute('data-id');
+        const episodeId: string = requiresNonNull(target.closest('.episode')).getAttribute('data-id') || '';
         const temp: HTMLInputElement = document.createElement('input');
         switch (type) {
             case ActionsButtons.Share: {
@@ -247,8 +254,43 @@ export class App {
                 break;
             }
             case ActionsButtons.Save:
+                if (this.appStorage.getCurrentUser() !== '') {
+                    const userName: string = this.appStorage.getCurrentUser();
+                    const savedEpisodes: number[] = this.appStorage.getSavedEpisode(userName);
+                    if (target.classList.contains('button_saved')) {
+                        savedEpisodes.push(Number(episodeId));
+                        this.appStorage.setSavedEpisode(userName, savedEpisodes);
+                    } else {
+                        const updatedArray: number[] = [];
+                        savedEpisodes.forEach((item) => {
+                            if (item !== Number(episodeId)) {
+                                updatedArray.push(item);
+                            }
+                        });
+                        this.appStorage.setSavedEpisode(userName, updatedArray);
+                    }
+                    const path: string = String(window.location);
+                    console.log(path);
+
+                    if (path.includes('saved')) this.onClickLink('saved');
+
+                }
+                console.log('Plese log in');
+
+                //                 const playlistMenu: HTMLElement = querySelectNonNull('.playlist-menu');
+                //                 playlistMenu.setAttribute('episodeId', episodeId);
+                //                 playlistMenu.style.top = `${event.clientY - 30}px`;
+                //                 playlistMenu.style.left = `${event.clientX}px`;
+                //                 playlistMenu.classList.remove('hidden');
+                //
+                //                 const hiddenMenu = () => {
+                //                     playlistMenu.classList.toggle('hidden');
+                //                     document.removeEventListener('click', hiddenMenu);
+                //                 };
+                //
+                //                 document.addEventListener('click', hiddenMenu);
                 break;
-            case ActionsButtons.More:
+            case ActionsButtons.Download:
                 this.downloadEpisode(event);
                 break;
         }
@@ -268,4 +310,24 @@ export class App {
         anchor.click();
         document.body.removeChild(anchor);
     }
+
+    private onClickLogin(email: string): void {
+        this.appStorage.login(email);
+    }
+
+    private onClickLogout(): void {
+        this.appStorage.logout();
+    }
+
+    private onClickAccount(email: string): void {
+        if (email === '') {
+            this.onClickLogout();
+        } else {
+            this.onClickLogin(email);
+        }
+    }
+
+    /*public checkAutorization(): boolean {
+        return this.appStorage.getCurrentUser() === '' ? false : true;
+    }*/
 }

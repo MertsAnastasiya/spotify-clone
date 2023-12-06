@@ -1,5 +1,5 @@
 import Controller from './controller';
-import { OnClickPlayButton, OnClickPodcastCard, podcastCard } from './types/type';
+import { OnClickPlayButton, OnClickPodcastCard, PodcastCard } from './types/type';
 import { replaceTags, requiresNonNull } from './utils';
 
 export default class Cards {
@@ -31,7 +31,7 @@ export default class Cards {
         }
     }
 
-    private drawCard(data: podcastCard) {
+    private drawCard(data: PodcastCard) {
         const podcastCards: Element = requiresNonNull(document.querySelector('.podcast__cards'));
         const card: Element = document.createElement('li');
         card.classList.add('card');

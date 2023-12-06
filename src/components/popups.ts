@@ -1,8 +1,8 @@
-import { Authentication, Authorization, Regestration } from './api/authorizationController';
-import { user } from './types/type';
+// import { Authentication, Authorization, Regestration } from './api/authorizationController';
+import { User } from './types/type';
 
 export default class Popups {
-    private registration: Regestration;
+    // private registration: Regestration;
     private btnText: string;
     private placeholdersRegister: string[] = ['name', 'phone', 'e-mail', 'password'];
     private namesRegister: string[] = ['userName', 'phone', 'email', 'userPassword'];
@@ -11,7 +11,7 @@ export default class Popups {
 
     constructor(btnText: string) {
         this.btnText = btnText;
-        this.registration = new Regestration();
+        // this.registration = new Regestration();
     }
 
     private addStructure() {
@@ -132,12 +132,12 @@ export default class Popups {
             btn.addEventListener('click', (e) => {
                 e.preventDefault;
                 this.deleteUser();
-              });
+            });
         }
     }
 
     private registerUser() {
-        const user: user = {
+        const user: User = {
             email: '',
             phone: '',
             userName: '',
@@ -151,13 +151,13 @@ export default class Popups {
         user.userPassword = inputPass.value;
         user.email = inputEmail.value;
         user.phone = inputPhone.value;
-        if (Object.values(user).every((val) => val !== '')) {
-            this.registration.addUser(user);
-        }
+        // if (Object.values(user).every((val) => val !== '')) {
+        //     this.registration.addUser(user);
+        // }
     }
 
     private updateUser() {
-        const user: user = {
+        const user: User = {
             email: '',
             phone: '',
             userName: '',
@@ -173,24 +173,24 @@ export default class Popups {
         user.userPassword = inputPass.value;
         user.email = inputEmail.value;
         user.phone = inputPhone.value;
-        if (localStorage.getItem('userEmail')) {
-            if (Object.values(user).every((val) => val !== '')) {
-                const update = new Authorization(localStorage.getItem('userEmail') as string);
-                update.updateUser(user).then(()=>{
-                    new Authorization(localStorage.getItem('userEmail') as string).signOut();
-                    localStorage.removeItem('userEmail');
-                });
-            }
-        }
+        // if (localStorage.getItem('userEmail')) {
+        // if (Object.values(user).every((val) => val !== '')) {
+        //     const update = new Authorization(localStorage.getItem('userEmail') as string);
+        //     update.updateUser(user).then(()=>{
+        //         new Authorization(localStorage.getItem('userEmail') as string).signOut();
+        //         localStorage.removeItem('userEmail');
+        //     });
+        // }
+        // }
     }
 
     private deleteUser() {
-      const inputEmail = document.querySelector('.modal__input.e-mail') as HTMLInputElement;
+        //   const inputEmail = document.querySelector('.modal__input.e-mail') as HTMLInputElement;
 
-      const deletedUser = new Authorization(inputEmail.value);
-      deletedUser.deleteUser();
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('userEmail');
+        //   const deletedUser = new Authorization(inputEmail.value);
+        //   deletedUser.deleteUser();
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('userEmail');
     }
 
     private fillInputs() {
@@ -198,7 +198,7 @@ export default class Popups {
         const inputEmail = document.querySelector('.modal__input.e-mail') as HTMLInputElement;
         const inputPhone = document.querySelector('.modal__input.phone') as HTMLInputElement;
         const inputPass = document.querySelector('.modal__input.password') as HTMLInputElement;
-        const userData: user = JSON.parse(localStorage.getItem('currentUser') as string);
+        const userData: User = JSON.parse(localStorage.getItem('currentUser') as string);
 
         if (userData) {
             inputEmail.value = userData.email;
@@ -209,10 +209,10 @@ export default class Popups {
     }
 
     private loginUser() {
-        const inputEmail = document.querySelector('.modal__input.e-mail') as HTMLInputElement;
-        const inputPass = document.querySelector('.modal__input.password') as HTMLInputElement;
-        const login = new Authentication(inputEmail.value, inputPass.value);
-        login.signIn();
+        // const inputEmail = document.querySelector('.modal__input.e-mail') as HTMLInputElement;
+        // const inputPass = document.querySelector('.modal__input.password') as HTMLInputElement;
+        // const login = new Authentication(inputEmail.value, inputPass.value);
+        // login.signIn();
     }
 
     private logOut() {
@@ -220,8 +220,8 @@ export default class Popups {
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
                 if (localStorage.getItem('userEmail')) {
-                    const logout = new Authorization(localStorage.getItem('userEmail') as string);
-                    logout.signOut();
+                    // const logout = new Authorization(localStorage.getItem('userEmail') as string);
+                    // logout.signOut();
                     localStorage.removeItem('currentUser');
                     localStorage.removeItem('userEmail');
                 }
@@ -250,23 +250,11 @@ export default class Popups {
         }
     }
 
-    public draw() {
-        if (this.btnText === 'register') {
-            this.addStructure();
-            this.createInputsReg();
-            this.addBtnRegister();
-        } else if (this.btnText === 'settings') {
-            this.addStructure();
-            this.createInputsSettings();
-            this.fillInputs();
-            this.addBtnUpdate();
-            this.addBtnDelete();
-        } else if (this.btnText === 'login') {
-            this.addStructure();
-            this.createInputsLogin();
-            this.addBtnLogin();
-        }
-        // this.changeAccountBtnText();
+    public draw(): void {
+        this.addStructure();
+        this.createInputsLogin();
+        this.addBtnLogin();
+
         this.closeModal();
         this.logOut();
     }

@@ -9,6 +9,7 @@
     justify-content: space-between;
     align-items: center;
     position: relative;
+    padding-bottom: 2rem;
 
     @include media-mobile {
         flex-direction: column;
@@ -44,16 +45,18 @@
     color: $color-additional;
 }
 
+// .podcast__subscribe {
+//     display: flex;
+//     justify-content: space-between;
+//     gap: 1rem;
+//     bottom: 0;
+// }
+
 .podcast__subscribe {
     display: flex;
-    justify-content: space-between;
     gap: 1rem;
-    bottom: 0;
-}
-
-.podcast__subscribe_spoti {
-    display: flex;
-    gap: 1rem;
+    padding-bottom: 2rem;
+    padding-left: 1rem;
 
     @include media-mobile {
         justify-content: center;
@@ -72,19 +75,14 @@
 }
 
 .podcast__description {
-    //spotify edition
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
     width: 30%;
 
     @include media-mobile {
         width: 100%;
     }
-}
-
-.podcast__about__rr {
-    //apple edition
-    width: 100%;
-    padding: 2rem 0;
-    overflow: hidden;
 }
 
 .button_more {
@@ -93,7 +91,6 @@
     position: relative;
 
     &::before {
-        // ???
         content: '';
         position: absolute;
         top: 0;
