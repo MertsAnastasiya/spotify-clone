@@ -34,7 +34,7 @@ export class AppStorage {
         localStorage.setItem('followedPodcasts', JSON.stringify(followedPodcasts));
     }
 
-    public login(email: string): void {
+    public login(email: string = 'nastya@gmail.com'): void {
         localStorage.setItem('user', JSON.stringify(email));
     }
 
