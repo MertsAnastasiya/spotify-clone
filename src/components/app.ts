@@ -70,6 +70,7 @@ export class App {
 
         this.createBasicRoutes();
         this.router.handleLocation();
+        this.appStorage.login('nastya@gmail.com');
 
         window.addEventListener('popstate', () => this.router.handleLocation());
     }
